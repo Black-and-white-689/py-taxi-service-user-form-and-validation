@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from django.contrib.auth import get_user_model
 
-from .models import Car
+from .models import Car, Manufacturer
 
 User = get_user_model()
 
