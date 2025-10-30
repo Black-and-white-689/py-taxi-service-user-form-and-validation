@@ -6,33 +6,47 @@ from django import forms
 
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Driver, Car
+from django.contrib.auth import get_user_model
+
+from .models import Car
+
+User = get_user_model()
 
 
 def validate_license_number(value: str):
     if value is None:
         raise forms.ValidationError("License number is required.")
     if len(value) != 8:
-        raise forms.ValidationError("License number must be exactly 8 characters.")
+        raise forms.ValidationError(
+            "License number must be exactly 8 characters."
+        )
     first3 = value[:3]
     last5 = value[3:]
     if not (first3.isalpha() and first3.isupper()):
-        raise forms.ValidationError("First 3 characters must be uppercase letters.")
+        raise forms.ValidationError(
+            "First 3 characters must be uppercase letters."
+        )
     if not last5.isdigit():
         raise forms.ValidationError("Last 5 characters must be digits.")
 
 
 class DriverCreationForm(UserCreationForm):
-    license_number = forms.CharField(max_length=8, validators=[validate_license_number])
+    license_number = forms.CharField(
+        max_length=8, validators=[validate_license_number])
 
-    class Meta:
-        model = Driver
-        fields = ("username", "first_name", "last_name", "license_number", "email", "password1", "password2")
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = UserCreationForm.Meta.fields + (
+            "first_name",
+            "last_name",
+            "license_number",
+            "email",
+        )
 
 
 class DriverLicenseUpdateForm(forms.ModelForm):
     class Meta:
-        model = Driver
+        model = User
         fields = ["license_number"]
 
     def clean_license_number(self):
